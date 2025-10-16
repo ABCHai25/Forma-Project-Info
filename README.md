@@ -1,73 +1,59 @@
-# React + TypeScript + Vite
+# Forma Building Color Extension
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React-based Forma extension that allows users to select and color buildings within Forma. Built following the [official Forma tutorial](https://aps.autodesk.com/en/docs/forma/v1/embedded-views/tutorial/).
 
-Currently, two official plugins are available:
+![Forma Extension Screenshot](screenshot.png) <!-- You may want to add a screenshot -->
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+- 🏗️ Building selection and identification
+- 🎨 Color picker for building customization
+- 🔍 Opacity control for transparency effects
+- ↩️ Reset functionality to restore original state
+- 📊 Display of total building count
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Prerequisites
 
-## Expanding the ESLint configuration
+Before you begin, ensure you have the following installed:
+- [Node.js](https://nodejs.org/) (version 14 or higher)
+- [npm](https://www.npmjs.com/) (usually comes with Node.js)
+- [Forma](https://forma.autodesk.com/) account and access
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Installation
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. Create a new React project:
+```bash
+npm init react
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2. Install the Forma SDK:
+```bash
+npm install forma-embedded-view-sdk
 ```
+
+3. Clone this repository:
+```bash
+git clone [your-repository-url]
+cd my-react-forma
+```
+
+4. Install remaining dependencies:
+```bash
+npm install
+```
+
+5. Start the development server:
+```bash
+npm run dev
+```
+
+## Tutorial Reference
+
+This extension was built following the [Forma Embedded Views Tutorial](https://aps.autodesk.com/en/docs/forma/v1/embedded-views/tutorial/). While the original tutorial uses Preact, this implementation uses React, which works equally well with the Forma SDK.
+
+Key differences from tutorial:
+- Uses React instead of Preact
+- Same functionality and SDK usage
+- Compatible with latest Forma SDK version
+
+[Rest of the README content remains the same as before...]
