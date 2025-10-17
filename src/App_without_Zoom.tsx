@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Forma } from "forma-embedded-view-sdk/auto";
 import './App.css'
 
-/** Normalized bbox we'll show in the UI */
+/** Normalized bbox we’ll show in the UI */
 type BBox = {
   west: number; south: number; east: number; north: number;
   crs?: string;
@@ -29,15 +29,6 @@ type Project = {
   name: string;
 };
 
-type MapboxData = {
-  center: { latitude: number; longitude: number };
-  zoom: number;
-  style: string;
-  size: { width: number; height: number };
-  bbox: { west: number; south: number; east: number; north: number };
-  url: string;
-};
-
 const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 const MAPBOX_STYLE = 'mapbox/satellite-v9';
 
@@ -46,15 +37,16 @@ function calculateArea(bbox: BBox): number {
   const height = Math.abs(bbox.north - bbox.south);
   return width * height;
 }
-
 function calculateDimensions(bbox: BBox): { width: number; length: number } {
   return {
     width: Math.abs(bbox.east - bbox.west),
     length: Math.abs(bbox.north - bbox.south)
   };
 }
-
-function calculateZoomLevel(bbox: BBox): number {
+function calculateZoomLevel( 
+  bbox: BBox, 
+  imageWidth: number = 1280
+): number {
   const width = Math.abs(bbox.east - bbox.west);
   const height = Math.abs(bbox.north - bbox.south);
   const maxDimension = Math.max(width, height);
@@ -71,7 +63,6 @@ function calculateZoomLevel(bbox: BBox): number {
   if (maxDimension < 6000) return 13;
   return 12;
 }
-
 function generateMapboxURL(
   center: { lat: number; lon: number },
   zoom: number,
@@ -87,8 +78,9 @@ function App() {
   const [projectData, setProjectData] = useState<Project | null>(null);
   const [bbox, setBbox] = useState<BBox | null>(null);
   const [projectId, setProjectId] = useState<string | null>(null);
-  const [mapboxData, setMapboxData] = useState<MapboxData | null>(null);
-  const [crs, setCrs] = useState<string>("EPSG:4326");
+  const [mapboxUrl, setMapboxUrl] = useState<string | null>(null);
+  const [mapboxData, setMapboxData] = useState<any>(null);
+  const [crs, setCrs] = useState<string>("EPSG:4326"); // keep 4326 by default (lon/lat)
 
   const bboxPretty = useMemo(() => {
     if (!bbox) return "";
@@ -136,6 +128,7 @@ function App() {
     try {
       const raw = await Forma.terrain.getBbox();
       
+      // Simple conversion from Forma's format
       const normalized: BBox = {
         west: raw.min.x,
         south: raw.min.y,
@@ -157,12 +150,14 @@ function App() {
       const id = await Forma.getProjectId();
       setProjectId(id);
 
+      // Get project location
       const geoLocation = await Forma.project.getGeoLocation();
       if (!geoLocation) {
         throw new Error("Could not get project location");
       }
       setLocation(geoLocation);
 
+      // Get full project metadata
       const project = await Forma.project.get();
       setProjectData(project);
       
@@ -173,7 +168,7 @@ function App() {
     }
   };
 
-  const fetchMapboxTile = async (zoomOverride?: number) => {
+  const fetchMapboxTile = async () => {
     if (!bbox || !location) {
       setStatus("Please fetch project info and bbox first ❌");
       return;
@@ -181,11 +176,24 @@ function App() {
 
     setStatus("Generating Mapbox URL...");
     try {
+      // Use geographic location as center
       const center = { lat: location[0], lon: location[1] };
-      const zoom = zoomOverride !== undefined ? zoomOverride : calculateZoomLevel(bbox);
-      const url = generateMapboxURL(center, zoom);
 
-      const newMapboxData: MapboxData = {
+      // Calculate zoom level based on location and bbox
+      const zoom = calculateZoomLevel(bbox);
+
+      console.log('Calculated zoom:', zoom);
+      console.log('Bbox dimensions (meters):', Math.max(
+      Math.abs(bbox.east - bbox.west),
+      Math.abs(bbox.north - bbox.south)
+    ));
+
+      // Generate Mapbox URL
+      const url = generateMapboxURL(center, zoom);
+      setMapboxUrl(url);
+
+      // Create structured data for API
+      const mapboxRequestData = {
         center: {
           latitude: center.lat,
           longitude: center.lon
@@ -205,40 +213,20 @@ function App() {
         url: url
       };
 
-      setMapboxData(newMapboxData);
+      setMapboxData(mapboxRequestData);
       setStatus("Mapbox URL generated ✔");
       
-      console.log("Mapbox Request Data:", {
-        center: newMapboxData.center,
-        zoom: newMapboxData.zoom,
-        style: newMapboxData.style,
-        size: newMapboxData.size,
-        bbox: newMapboxData.bbox
-      });
+      console.log("Mapbox Request Data:", mapboxRequestData);
     } catch (err) {
       console.error("Failed to generate Mapbox URL:", err);
       setStatus("Error generating Mapbox URL ❌");
     }
   };
 
-  const adjustZoom = (delta: number) => {
-    if (!mapboxData) return;
-    const newZoom = Math.max(1, Math.min(20, mapboxData.zoom + delta));
-    fetchMapboxTile(newZoom);
-  };
-
   const copyMapboxJSON = async () => {
     if (!mapboxData) return;
 
-    const safeData = {
-      center: mapboxData.center,
-      zoom: mapboxData.zoom,
-      style: mapboxData.style,
-      size: mapboxData.size,
-      bbox: mapboxData.bbox
-    };
-
-    await navigator.clipboard.writeText(JSON.stringify(safeData, null, 2));
+    await navigator.clipboard.writeText(JSON.stringify(mapboxData, null, 2));
     setStatus("Mapbox JSON copied to clipboard ✔");
     setTimeout(() => setStatus(""), 1200);
   };
@@ -252,13 +240,14 @@ function App() {
         <select value={crs} onChange={(e) => setCrs(e.target.value)}>
           <option value="EPSG:4326">EPSG:4326 (lon/lat)</option>
           <option value="EPSG:3857">EPSG:3857 (web mercator)</option>
+          {/* add more if you know they’re supported */}
         </select>
       </label>
 
       <div className="buttons">
         <button onClick={getProjectInfo}>Get Project Info</button>
         <button onClick={getBBox}>Get Terrain BBox</button>
-        <button onClick={() => fetchMapboxTile()} disabled={!bbox || !location}>
+        <button onClick={fetchMapboxTile} disabled={!bbox || !location}>
           Fetch Mapbox Tile
         </button>
         <button onClick={copyJSON} disabled={!bbox}>Copy JSON</button>
@@ -270,7 +259,7 @@ function App() {
           <span>{status || "—"}</span>
         </div>
 
-        {location && (
+         {location && (
           <div className="section">
             <h3>Geographic Location</h3>
             <div className="line">
@@ -325,76 +314,68 @@ function App() {
               <span className="label">Image Size:</span>
               <span>{mapboxData.size.width} × {mapboxData.size.height}</span>
             </div>
-
-            <div className="buttons" style={{ marginTop: '15px' }}>
-              <button 
-                onClick={() => adjustZoom(-1)}
-                disabled={mapboxData.zoom <= 1}
-              >
-                ➖ Zoom Out
-              </button>
-              <button 
-                onClick={() => adjustZoom(1)}
-                disabled={mapboxData.zoom >= 20}
-              >
-                ➕ Zoom In
-              </button>
-              <button onClick={() => fetchMapboxTile()}>
-                🔄 Reset
-              </button>
-            </div>
             
-            <button onClick={copyMapboxJSON} style={{ marginTop: '10px', width: '100%' }}>
-              Copy Mapbox JSON
-            </button>
-            
-            <img 
-              src={mapboxData.url} 
-              alt="Satellite view" 
-              style={{ 
-                width: '100%', 
-                marginTop: '10px',
-                border: '1px solid #ddd',
-                borderRadius: '4px'
-              }} 
-            />
+            {mapboxUrl && (
+              <>
+                <button onClick={copyMapboxJSON} style={{ marginTop: '10px' }}>
+                  Copy Mapbox JSON
+                </button>
+                <div style={{ marginTop: '10px' }}>
+                  <a href={mapboxUrl} target="_blank" rel="noopener noreferrer">
+                    View Satellite Image
+                  </a>
+                </div>
+                {/* Optional: Display the image directly */}
+                <img 
+                  src={mapboxUrl} 
+                  alt="Satellite view" 
+                  style={{ 
+                    maxWidth: '100%', 
+                    marginTop: '10px',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px'
+                  }} 
+                />
+              </>
+            )}
           </div>
         )}
 
-        {bbox && (
-          <div className="section">
-            <h3>Terrain Bounds</h3>
-            <div className="line">
-              <span className="label">West:</span>
-              <span>{bbox.west.toFixed(2)} m</span>
-            </div>
-            <div className="line">
-              <span className="label">South:</span>
-              <span>{bbox.south.toFixed(2)} m</span>
-            </div>
-            <div className="line">
-              <span className="label">East:</span>
-              <span>{bbox.east.toFixed(2)} m</span>
-            </div>
-            <div className="line">
-              <span className="label">North:</span>
-              <span>{bbox.north.toFixed(2)} m</span>
-            </div>
-            <div className="line">
-              <span className="label">Width:</span>
-              <span>{calculateDimensions(bbox).width.toFixed(2)} m</span>
-            </div>
-            <div className="line">
-              <span className="label">Length:</span>
-              <span>{calculateDimensions(bbox).length.toFixed(2)} m</span>
+        {bbox ? (
+          <>
+            <h3>Bbox Values</h3>
+            <div className="line"><span className="label">west:</span><span>{bbox.west}</span></div>
+            <div className="line"><span className="label">south:</span><span>{bbox.south}</span></div>
+            <div className="line"><span className="label">east:</span><span>{bbox.east}</span></div>
+            <div className="line"><span className="label">north:</span><span>{bbox.north}</span></div>
+            {bbox.crs && (
+              <div className="line"><span className="label">crs:</span><span>{bbox.crs}</span></div>
+            )}
+            <div className="section">
+              <h4>Tile Dimensions</h4>
+              <div className="line">
+                <span className="label">Width:</span>
+                <span>{calculateDimensions(bbox).width.toFixed(2)} m</span>
+              </div>
+              <div className="line">
+                <span className="label">Length:</span>
+                <span>{calculateDimensions(bbox).length.toFixed(2)} m</span>
+              </div>
             </div>
             <div className="line">
               <span className="label">Area:</span>
               <span>{calculateArea(bbox).toFixed(2)} m²</span>
             </div>
-          </div>
+            <pre className="json">{bboxPretty}</pre>
+          </>
+        ) : (
+          <p className="muted">No information yet on the Bbox.</p>
         )}
       </div>
+
+      <small className="hint">
+        Tip: This panel runs inside a Forma iframe. The call goes through the Embedded View SDK to the host. See the tutorial for how the panel is wired.
+      </small>
     </div>
   );
 }
