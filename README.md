@@ -1,59 +1,53 @@
-# Forma Building Color Extension
+# Forma Project Info Extension
 
-A React-based Forma extension that allows users to select and color buildings within Forma. Built following the [official Forma tutorial](https://aps.autodesk.com/en/docs/forma/v1/embedded-views/tutorial/).
+A React-based Forma extension that retrieves and displays comprehensive project information including geographic location, terrain bounds, and project metadata.
 
-![Forma Extension Screenshot](/ScreenshotFormExtension.png)
+![Forma Extension Screenshot](/public/ScreenshotFormExtension.png)
 
 ## Features
 
-- 🏗️ Building selection and identification
-- 🎨 Color picker for building customization
-- 🔍 Opacity control for transparency effects
-- ↩️ Reset functionality to restore original state
-- 📊 Display of total building count
+- 📍 Geographic Location (Latitude/Longitude)
+- 🗺️ Terrain Bounding Box Information
+- 📐 Terrain Tile Dimensions and Area
+- 📋 Project Metadata
+- 💾 Export All Data as JSON
 
-## Prerequisites
+## Technical Details
 
-Before you begin, ensure you have the following installed:
-- [Node.js](https://nodejs.org/) (version 14 or higher)
-- [npm](https://www.npmjs.com/) (usually comes with Node.js)
-- [Forma](https://forma.autodesk.com/) account and access
+- Built with React + TypeScript + Vite
+- Uses Forma Embedded View SDK
+- Implements CRS (Coordinate Reference System) handling
+- Provides dimension calculations and area measurements
 
 ## Installation
 
-1. Create a new React project:
-```bash
-npm init react
-```
-
-2. Install the Forma SDK:
-```bash
-npm install forma-embedded-view-sdk
-```
-
-3. Clone this repository:
+1. Clone the repository:
 ```bash
 git clone [your-repository-url]
-cd my-react-forma
+cd Forma-Project-Info
 ```
 
-4. Install remaining dependencies:
+2. Install dependencies:
 ```bash
 npm install
 ```
 
-5. Start the development server:
+3. Start the development server:
 ```bash
 npm run dev
 ```
 
-## Tutorial Reference
+## Usage
 
-This extension was built following the [Forma Embedded Views Tutorial](https://aps.autodesk.com/en/docs/forma/v1/embedded-views/tutorial/). While the original tutorial uses Preact, this implementation uses React, which works equally well with the Forma SDK.
+1. Launch the extension in Forma
+2. Click "Get Project Info" to retrieve project metadata
+3. Click "Get Terrain BBox" to fetch terrain bounds
+4. Use "Copy JSON" to export all data to clipboard
 
-Key differences from tutorial:
-- Uses React instead of Preact
-- Same functionality and SDK usage
-- Compatible with latest Forma SDK version
+## Data Structure
 
-[Rest of the README content remains the same as before...]
+The extension provides the following information:
+- Geographic coordinates (WGS84/EPSG:4326)
+- Project details (ID, name, country, timezone, etc.)
+- Terrain bounds with dimensions and area
+- CRS information and reference points
