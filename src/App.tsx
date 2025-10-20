@@ -243,6 +243,44 @@ function App() {
     setTimeout(() => setStatus(""), 1200);
   };
 
+  const downloadTile = async () => {
+    if (!mapboxData || !mapboxData.url) {
+      setStatus("No tile to download ❌");
+      return;
+    }
+
+    setStatus("Downloading tile...");
+    try {
+      // Fetch the image from Mapbox
+      const response = await fetch(mapboxData.url);
+      const blob = await response.blob();
+      
+      // Create a download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      
+      // Generate filename with project info and timestamp
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+      const filename = `satellite_tile_${projectId || 'unknown'}_zoom${mapboxData.zoom}_${timestamp}.png`;
+      link.download = filename;
+      
+      // Trigger download
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      setStatus(`Tile downloaded: ${filename} ✔`);
+      setTimeout(() => setStatus(""), 3000);
+    } catch (err) {
+      console.error("Failed to download tile:", err);
+      setStatus("Error downloading tile ❌");
+    }
+  };
+
   return (
     <div className="panel">
       <h2>Forma Project Info</h2>
@@ -344,9 +382,22 @@ function App() {
               </button>
             </div>
             
-            <button onClick={copyMapboxJSON} style={{ marginTop: '10px', width: '100%' }}>
-              Copy Mapbox JSON
-            </button>
+            <div className="buttons" style={{ marginTop: '10px' }}>
+              <button onClick={copyMapboxJSON} style={{ flex: 1 }}>
+                Copy Mapbox JSON
+              </button>
+              <button 
+                onClick={downloadTile} 
+                style={{ 
+                  flex: 1,
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  fontWeight: 'bold'
+                }}
+              >
+                Download Tile
+              </button>
+            </div>
             
             <img 
               src={mapboxData.url} 
