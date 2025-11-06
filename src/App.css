@@ -31,12 +31,23 @@ body {
 .panel {
   padding: 16px;
   font-family: "NB Grotesk Bold", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  width: 320px;
+  width: 100%;
+  max-width: 1000px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  max-width: 600px;
   margin: 0 auto;
+  padding-left: max(16px, 8px);
+  padding-right: max(16px, 8px);
+}
+
+/* Centered title */
+.panel h2 {
+  text-align: center;
+  margin: 10px auto 20px;
+  font-size: 1.8em;
+  width: calc(100% - 40px);
+  max-width: 1000px;
 }
 
 .row {
@@ -60,12 +71,14 @@ body {
 
 .buttons {
   display: flex;
-  gap: 8px;
-  margin: 15px 0;
+  gap: 15px;
+  margin: 10px 10px;
+  flex-wrap: nowrap;
+  justify-content: center;
 }
 
 button {
-  padding: 8px 12px;
+  padding: 20px 25px;
   border: 1px solid #ddd;
   border-radius: 8px;
   cursor: pointer;
@@ -78,16 +91,77 @@ button:disabled {
 }
 
 .box {
-  margin-top: 20px;
+  margin-top: 1px;
   border: 1px solid #e5e5e5;
-  border-radius: 8px;
-  padding: 10px;
+  border-radius: 12px;
+  padding: 20px;
   background: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  
+  /* Fixed width for consistent positioning */
+  width: calc(100% - 40px);
+  max-width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+/* Two-column layout for Satellite Tab */
+.content-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 20px;
+  align-items: start;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.content-left {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.content-right {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  min-width: 0; /* Prevent overflow */
+  overflow: hidden; /* Contain content */
+}
+
+.image-display {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border: 2px solid #dddddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+  object-fit: contain;
+}
+
+/* Responsive: stack on small screens */
+@media (max-width: 900px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .box {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+  
+  .panel {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
 }
 
 .line {
   display: flex;
   justify-content: space-between;
+  gap: 15px;
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   font-size: 13px;
   padding: 2px 0;
@@ -97,7 +171,18 @@ button:disabled {
 .label {
   color: #555;
   margin-right: 8px;
-  min-width: 80px;
+  min-width: 70px;
+  flex-shrink: 0;
+}
+
+.param-input {
+  width: 70px;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+  text-align: center;
 }
 
 .json {
@@ -123,12 +208,341 @@ button:disabled {
 
 .section {
   margin: 20px 0;
-  padding-top: 10px;
+  padding-top: 50px;
   border-top: 1px solid #eee;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 h3 {
   margin: 0 0 10px 0;
   font-size: 1.1em;
   color: #333;
+}
+
+h4 {
+  margin: 0 0 8px 0;
+  font-size: 0.95em;
+  color: #2c3e50;
+}
+
+/* Phase 2.5 - Tab Navigation */
+.tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 0;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+  border-bottom: none;
+  width: calc(100% - 40px);
+  max-width: 1000px;
+}
+
+.tabs button {
+  padding: 12px 24px;
+  border: none;
+  background: #ffffff;
+  cursor: pointer;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  font-size: 1em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tabs button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.tabs button.active {
+  background: #0696d7;
+  color: #ffffff;
+  font-weight: bold;
+  transform: translateY(-2px);
+}
+
+/* Specific shadow colors for each tab */
+.tabs button:first-child {
+  /* Satellite tile button - deep blue shadow */
+  box-shadow: 0 2px 8px rgba(0, 0, 0  , 0.4);
+}
+
+.tabs button:first-child:hover:not(:disabled),
+.tabs button:first-child.active {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.tabs button:last-child {
+  /* Tree detection button - emerald green shadow */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.tabs button:last-child:hover:not(:disabled),
+.tabs button:last-child.active {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.tabs button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #f5f5f5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Phase 2.4 - HSV Controls */
+.hsv-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.threshold-group {
+  border: 1px solid #ddd;
+  padding: 15px;
+  border-radius: 5px;
+  background: #fafafa;
+}
+
+.slider-row {
+  margin-bottom: 15px;
+}
+
+.slider-row label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+  font-weight: 500;
+  font-size: 0.9em;
+}
+
+.slider-row label span {
+  flex: 0 0 auto;
+}
+
+.slider-row label input[type="number"] {
+  width: 65px;
+  padding: 4px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9em;
+  text-align: center;
+  margin-left: 10px;
+}
+
+.slider-row input[type="range"] {
+  width: 100%;
+  cursor: pointer;
+}
+
+.slider-row input[type="number"] {
+  width: 60px;
+  padding: 4px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.85em;
+  text-align: center;
+}
+
+/* HSV input group with slider + number input */
+.hsv-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.hsv-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hsv-input-row input[type="range"] {
+  flex: 1;
+}
+
+.hsv-input-row input[type="number"] {
+  width: 55px;
+}
+
+/* Phase 2.4 - Detection Preview */
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* Phase 2.4 - Detection Preview Controls */
+.preview-controls {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.opacity-control {
+  flex: 1;
+  min-width: 200px;
+}
+
+.opacity-control label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+.opacity-control input[type="range"] {
+  width: 100%;
+  cursor: pointer;
+}
+
+.preview-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto 15px;
+}
+
+.preview-image {
+  width: 100%;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  display: block;
+}
+
+.preview-image.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0.6;
+  mix-blend-mode: multiply;
+}
+
+.detection-summary {
+  margin-top: 15px;
+  padding: 12px;
+  background: #e8f5e9;
+  border-radius: 5px;
+  border-left: 4px solid #4caf50;
+}
+
+.detection-summary p {
+  margin: 5px 0;
+  font-size: 0.9em;
+}
+
+/* Phase 2.4 - Tree List */
+.tree-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.tree-list {
+  max-height: 400px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+.tree-list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tree-list th {
+  background: #2c3e50;
+  color: white;
+  padding: 10px;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  font-size: 0.9em;
+}
+
+.tree-list td {
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  font-size: 0.85em;
+}
+
+.tree-list tbody tr:hover {
+  background: #f5f5f5;
+}
+
+/* Phase 2.4 - Model Result */
+.model-stats {
+  background: #e3f2fd;
+  padding: 15px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  border-left: 4px solid #2196f3;
+}
+
+.download-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Button Variants - Phase 2.4 */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: #3498db;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #2980b9;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: #95a5a6;
+  color: white;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #7f8c8d;
+}
+
+.btn-success {
+  background: #27ae60;
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #229954;
+  transform: translateY(-1px);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Help Text */
+.help-text {
+  font-size: 0.85em;
+  color: #7f8c8d;
+  margin-top: 10px;
+  line-height: 1.4;
 }
