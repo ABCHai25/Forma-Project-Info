@@ -79,8 +79,9 @@ python_backend/tree_model/*
 !python_backend/tree_model/tree_lowpoly.obj
 !python_backend/tree_model/treeModel_12m.obj
 
-# GitHub Copilot instructions (contains API usage guidance)
+# GitHub Workflows (needed for CI/CD automation)
 .github/
+!.github/workflows/
 
 # Forma token utility scripts (not currently used, reads/writes .env)
 forma_token/
