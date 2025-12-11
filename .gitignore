@@ -108,6 +108,8 @@ public/test-full-auth.html
 .directus-template-cli/
 my-directus-project/
 src/services/email.js
+nginx.conf.example
+docker-compose.production.yml
 
 # Docker
 .dockerignore

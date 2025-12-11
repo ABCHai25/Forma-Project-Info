@@ -18,6 +18,22 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const PYTHON_API_URL = process.env.PYTHON_API_URL || 'http://localhost:5001';
 
+// =============================================================================
+// CORS Configuration
+// =============================================================================
+// ALLOWED_ORIGINS: Comma-separated list of allowed origins for CORS
+// Example: "https://app.autodeskforma.eu,https://forma-trees.henn.com"
+// 
+// For Forma extensions, you MUST include the Forma app origin:
+// - EU: https://app.autodeskforma.eu
+// - US: https://app.autodeskforma.com
+// =============================================================================
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
+  : ['http://localhost:5173', 'http://localhost:3001']; // Dev defaults
+
+console.log('🔒 CORS allowed origins:', ALLOWED_ORIGINS);
+
 // Configure multer for memory storage (we'll forward to Python)
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -25,19 +41,31 @@ const upload = multer({
 });
 
 // Middleware
-// Allow requests from both Vite dev server and same-origin (when served from Express)
-// Also handle Forma iframe which might send no origin or a different origin
+// CORS configuration for Forma iframe embedding and API access
 app.use(cors({
   origin: function(origin, callback) {
-    // Allow requests with no origin (same-origin, curl, Postman, etc.)
-    // Also allow localhost on any port for development
-    if (!origin || origin.startsWith('http://localhost')) {
-      callback(null, true);
-    } else {
-      callback(null, true); // Be permissive in dev - tighten for production
+    // Allow requests with no origin (same-origin requests, curl, Postman, health checks)
+    if (!origin) {
+      return callback(null, true);
     }
+    
+    // In development, allow all localhost origins
+    if (process.env.NODE_ENV !== 'production' && origin.startsWith('http://localhost')) {
+      return callback(null, true);
+    }
+    
+    // Check if origin is in the allowed list
+    if (ALLOWED_ORIGINS.includes(origin) || ALLOWED_ORIGINS.includes('*')) {
+      return callback(null, true);
+    }
+    
+    // Log rejected origins for debugging
+    console.warn(`⚠️ CORS: Rejected origin: ${origin}`);
+    callback(new Error(`Origin ${origin} not allowed by CORS`));
   },
-  credentials: true
+  credentials: true,
+  // Expose headers needed for file downloads
+  exposedHeaders: ['Content-Disposition']
 }));
 app.use(express.json({ limit: '50mb' })); // Increase limit for base64 image data
 app.use(express.urlencoded({ limit: '50mb', extended: true }));

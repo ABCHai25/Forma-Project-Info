@@ -22,7 +22,7 @@ services:
       args:
         # Pass Mapbox token at build time for Vite to embed in frontend
         VITE_MAPBOX_TOKEN: ${VITE_MAPBOX_TOKEN}
-        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-}
+        # Note: VITE_API_BASE_URL is no longer needed - we use relative URLs
     container_name: forma-backend
     ports:
       - "3001:3001"
@@ -33,6 +33,9 @@ services:
       
       # Python API URL (internal Docker network)
       - PYTHON_API_URL=http://python-api:5001
+      
+      # CORS - allow localhost for local development
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:3001}
       
       # Session configuration
       - SESSION_SECRET=${SESSION_SECRET:-forma-dev-secret-change-in-production}

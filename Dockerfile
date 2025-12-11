@@ -10,14 +10,16 @@
 # =============================================================================
 FROM node:20-alpine AS frontend-builder
 
-# Build arguments for frontend environment variables
-# These are injected at build time for Vite to embed in the bundle
+# Build argument for Mapbox token (REQUIRED)
+# This is baked into the frontend JavaScript at build time
 ARG VITE_MAPBOX_TOKEN
-ARG VITE_API_BASE_URL
 
-# Set as environment variables so Vite can access them during build
+# Note: We use relative URLs (/api/*) instead of VITE_API_BASE_URL
+# This allows the same build to work in any environment (dev, staging, prod)
+# The frontend calls /api/* and nginx/Express routes to the correct backend
+
+# Set as environment variable so Vite can access it during build
 ENV VITE_MAPBOX_TOKEN=$VITE_MAPBOX_TOKEN
-ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 WORKDIR /app
 

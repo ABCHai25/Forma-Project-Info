@@ -1,5 +1,9 @@
 /**
  * 3D model generation service - API calls to Python backend for 3D model creation
+ * 
+ * Uses relative URLs (/api/*) which work in both:
+ * - Development: Vite proxy forwards to localhost:3001
+ * - Production: nginx proxy forwards to backend container
  */
 
 import type { 
@@ -7,7 +11,12 @@ import type {
   Model3DGenerationResult 
 } from '../types/model3D.types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001';
+// Use relative URL (empty string) - automatically uses /api/* paths
+// This works in both development and production:
+// - Dev: Vite proxy (in vite.config.ts) forwards /api/* → localhost:3001
+// - Prod: nginx forwards /api/* → backend container on port 8012
+// By using relative URLs, the same build works everywhere without env var changes
+const API_BASE_URL = '';
 
 /**
  * Generate 3D model from detected trees

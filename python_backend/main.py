@@ -21,6 +21,20 @@ from model_generator_core import generate_obj_content, generate_model_metadata
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# =============================================================================
+# CORS Configuration
+# =============================================================================
+# ALLOWED_ORIGINS: Comma-separated list of allowed origins for CORS
+# Example: "https://app.autodeskforma.eu,https://forma-trees.henn.com"
+# 
+# Note: In production, the Express backend proxies requests to this Python API,
+# so direct CORS isn't usually needed. This is mainly for local development
+# and debugging when accessing the Python API directly.
+# =============================================================================
+ALLOWED_ORIGINS = os.environ.get('ALLOWED_ORIGINS', '*').split(',')
+ALLOWED_ORIGINS = [origin.strip() for origin in ALLOWED_ORIGINS]
+logger.info(f"🔒 CORS allowed origins: {ALLOWED_ORIGINS}")
+
 # Create FastAPI app
 app = FastAPI(
     title="Tree Detection API",
@@ -28,10 +42,12 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Add CORS middleware (optional - Express will proxy, but useful for testing)
+# Add CORS middleware
+# In production, Express proxies to this API, so CORS is less critical here
+# But we configure it properly for direct access during development/debugging
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify exact origins
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
