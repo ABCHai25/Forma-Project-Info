@@ -22,8 +22,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/forma-backend
-  PYTHON_IMAGE: ghcr.io/${{ github.repository_owner }}/forma-python
+  BACKEND_IMAGE: ghcr.io/${{ github.repository_owner }}/forma-trees-backend
+  PYTHON_IMAGE: ghcr.io/${{ github.repository_owner }}/forma-trees-python
 
 jobs:
   build-backend:
