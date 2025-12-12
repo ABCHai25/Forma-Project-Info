@@ -36,8 +36,10 @@ services:
       - PYTHON_API_URL=http://forma-trees-python:5001
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
       - SESSION_SECRET=${SESSION_SECRET}
+      - JWT_SECRET=${JWT_SECRET}
       - DIRECTUS_URL=${DIRECTUS_URL}
       - DIRECTUS_STATIC_TOKEN=${DIRECTUS_STATIC_TOKEN}
+      - APP_URL=${APP_URL}
     networks:
       - forma-network
 
