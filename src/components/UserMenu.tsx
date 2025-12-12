@@ -104,7 +104,7 @@ export function UserMenu({ currentPage = 'home', onNavigate }: UserMenuProps) {
     
     // Preserve Forma's query parameters when redirecting to login
     const queryString = window.location.search;
-    window.location.href = '/login.html' + queryString;
+    window.location.href = 'login.html' + queryString;
   };
 
   const handleNavigation = (page: 'home' | 'projects') => {

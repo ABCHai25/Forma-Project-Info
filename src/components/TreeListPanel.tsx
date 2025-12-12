@@ -164,7 +164,7 @@ export function TreeListPanel({
       console.log('📦 Requesting 3D model generation...');
       
       // Call backend with detection data
-      const response = await fetch(`${API_BASE_URL}/api/generate-model`, {
+      const response = await fetch('api/generate-model', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

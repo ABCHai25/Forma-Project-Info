@@ -64,7 +64,7 @@ export async function detectTrees(
     formData.append('real_width', realDimensions.width.toString());
     formData.append('real_height', realDimensions.height.toString());
 
-    const response = await fetch(`${API_BASE_URL}/api/detect-trees`, {
+    const response = await fetch('api/detect-trees', {
       method: 'POST',
       body: formData,
       signal: controller.signal
@@ -121,7 +121,7 @@ async function convertDataUrlToBlob(dataURL: string): Promise<Blob> {
 export async function getDetectionStatus(taskId: string): Promise<TreeDetectionResult> {
   console.log('🔍 Checking detection status:', taskId);
 
-  const response = await fetch(`${API_BASE_URL}/api/detect-trees/${taskId}`);
+  const response = await fetch(`api/detect-trees/${taskId}`);
 
   if (!response.ok) {
     const error = await response.json();

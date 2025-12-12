@@ -32,7 +32,7 @@ export async function generate3DModel(
   console.log('Terrain dimensions:', request.bbox);
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/generate-model`, {
+    const response = await fetch('api/generate-model', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ export function downloadModel(url: string, filename: string): void {
 export async function getModelStatus(modelId: string): Promise<Model3DGenerationResult> {
   console.log('🔍 Checking model generation status:', modelId);
 
-  const response = await fetch(`${API_BASE_URL}/api/generate-model/${modelId}`);
+  const response = await fetch(`api/generate-model/${modelId}`);
 
   if (!response.ok) {
     const error = await response.json();

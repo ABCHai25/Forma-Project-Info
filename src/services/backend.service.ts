@@ -41,7 +41,7 @@ export interface SaveTileResponse {
  * Save tile to backend
  */
 export async function saveTile(payload: SaveTilePayload): Promise<SaveTileResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/saveTile`, {
+  const response = await fetch('api/saveTile', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
