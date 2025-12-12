@@ -23,7 +23,7 @@ services:
         # Pass Mapbox token at build time for Vite to embed in frontend
         VITE_MAPBOX_TOKEN: ${VITE_MAPBOX_TOKEN}
         # Note: VITE_API_BASE_URL is no longer needed - we use relative URLs
-    container_name: forma-backend
+    container_name: forma-trees-backend
     ports:
       - "3001:3001"
     environment:
@@ -71,7 +71,7 @@ services:
     build:
       context: ./python_backend
       dockerfile: Dockerfile
-    container_name: forma-python
+    container_name: forma-trees-python
     ports:
       - "5001:5001"
     environment:

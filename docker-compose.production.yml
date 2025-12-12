@@ -1,0 +1,78 @@
+# =============================================================================
+# Docker Compose for Production Deployment (Linux Server)
+# =============================================================================
+# 
+# Deployment URL: https://webapps.henn.com/forma-tree
+# 
+# This file is configured for deployment on the company's Linux server.
+# It uses the "Carbonitor" pattern where an Nginx container acts as the gateway.
+#
+# Port Assignment:
+# - Nginx Gateway: 8012 (Exposed to host)
+# - Backend (Express + React): 3001 (Internal)
+# - Python API (FastAPI): 5001 (Internal)
+#
+# Usage:
+#   docker-compose -f docker-compose.production.yml pull
+#   docker-compose -f docker-compose.production.yml up -d
+#
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # ===========================================================================
+  # Express Backend + React Frontend (Main Application)
+  # ===========================================================================
+  forma-backend:
+    image: ghcr.io/henn-dt/forma-backend:latest
+    container_name: forma-backend
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - PYTHON_API_URL=http://forma-python:5001
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - DIRECTUS_URL=${DIRECTUS_URL}
+      - DIRECTUS_STATIC_TOKEN=${DIRECTUS_STATIC_TOKEN}
+    networks:
+      - forma-network
+
+  # ===========================================================================
+  # Python API (Tree Detection & 3D Models)
+  # ===========================================================================
+  forma-python:
+    image: ghcr.io/henn-dt/forma-python:latest
+    container_name: forma-python
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+    ports:
+      - "5012:5001"  
+    networks:
+      - forma-network
+
+  # ===========================================================================
+  # Nginx Gateway (Matches Carbonitor Pattern)
+  # ===========================================================================
+  nginx:
+    image: nginx:alpine
+    container_name: forma-trees-nginx
+    restart: always
+    ports:
+      - "8012:80"   
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - forma-backend
+    networks:
+      - forma-network
+
+networks:
+  forma-network:
+    driver: bridge

@@ -15,6 +15,7 @@
 .env
 .env.*
 !.env.example
+!.env.production.example
 !backend/.env.example
 .env.local
 .env.development.local
@@ -109,7 +110,7 @@ public/test-full-auth.html
 my-directus-project/
 src/services/email.js
 nginx.conf.example
-docker-compose.production.yml
+#docker-compose.production.yml
 
 # Docker
 .dockerignore
