@@ -22,7 +22,7 @@ require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 const isProduction = process.env.NODE_ENV === 'production';
 if (isProduction) {
   // Check for required environment variables
-  const requiredEnvVars = ['SESSION_SECRET', 'JWT_SECRET', 'DIRECTUS_URL', 'DIRECTUS_STATIC_TOKEN'];
+  const requiredEnvVars = ['SESSION_SECRET', 'DIRECTUS_URL', 'DIRECTUS_STATIC_TOKEN'];
   const missing = requiredEnvVars.filter(v => !process.env[v]);
   if (missing.length > 0) {
     console.error('❌ FATAL: Missing required environment variables:', missing.join(', '));
@@ -33,11 +33,6 @@ if (isProduction) {
   // Warn if using default secrets
   if (process.env.SESSION_SECRET?.includes('change-in-production')) {
     console.error('❌ FATAL: Using default SESSION_SECRET in production!');
-    console.error('   Generate a secure secret: openssl rand -base64 32');
-    process.exit(1);
-  }
-  if (process.env.JWT_SECRET?.includes('change-in-production')) {
-    console.error('❌ FATAL: Using default JWT_SECRET in production!');
     console.error('   Generate a secure secret: openssl rand -base64 32');
     process.exit(1);
   }
